@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <link rel="icon" type="image/png" href="images/bild.png">
+    <link rel="apple-touch-icon" href="images/bild.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One state RP - Ultimate Neon Experience</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-pink: #ff00e5;
+            --neon-purple: #bc13fe;
+            --dark-bg: #050508;
+            --card-bg: rgba(20, 20, 25, 0.9);
+            --text-main: #e0e0e0;
+            --success: #00ff88;
+            --danger: #ff4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, .brand {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #neonRain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            background: radial-gradient(circle at center, #0a0a15 0%, #050508 100%);
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- SIDEBAR NAVIGATION --- */
+        .sidebar-trigger {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 75px; /* Vergrößerte Hover-Zone (ca. 2cm) */
+            z-index: 2000;
+        }
+
+        /* PFEIL INDIKATOR */
+        .nav-indicator {
+            position: fixed;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1999;
+            color: var(--neon-blue);
+            font-size: 2rem;
+            animation: pulseArrow 2s infinite;
+            pointer-events: none;
+            text-shadow: 0 0 10px var(--neon-blue);
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes pulseArrow {
+            0%, 100% { transform: translateY(-50%) translateX(0); opacity: 0.5; }
+            50% { transform: translateY(-50%) translateX(10px); opacity: 1; }
+        }
+
+        /* Pfeil ausblenden wenn Sidebar aktiv oder Trigger gehovert */
+        .sidebar-trigger:hover ~ .nav-indicator,
+        nav:hover ~ .nav-indicator {
+            opacity: 0;
+        }
+
+        nav {
+            background: rgba(5, 5, 8, 0.98);
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            left: -280px; /* Versteckt */
+            top: 0;
+            z-index: 2001;
+            border-right: 2px solid var(--neon-blue);
+            box-shadow: 10px 0 30px rgba(0, 242, 255, 0.2);
+            transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Anzeigen wenn Trigger oder Nav gehovert wird */
+        .sidebar-trigger:hover + nav, nav:hover {
+            left: 0;
+        }
+
+        .brand {
+            font-size: 1.2rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            cursor: pointer;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 242, 255, 0.3);
+            padding-bottom: 1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 1rem;
+            transition: 0.3s;
+            cursor: pointer;
+            padding: 0.8rem 1rem;
+            border-radius: 5px;
+            border-left: 0 solid var(--neon-pink);
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+            background: rgba(255, 0, 229, 0.05);
+            border-left-width: 4px;
+            padding-left: 1.2rem;
+        }
+
+        /* --- END SIDEBAR NAVIGATION --- */
+
+        .view {
+            display: none;
+            padding: 4rem 5%;
+            min-height: 100vh;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            color: white;
+            text-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
+            margin-bottom: 1rem;
+        }
+
+        .logo-display-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 2rem auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .main-logo-box {
+            width: 280px;
+            height: 280px;
+            border: 3px solid var(--neon-blue);
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .main-logo-box img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .btn-neon {
+            padding: 1rem 2.5rem;
+            background: transparent;
+            color: var(--neon-pink);
+            border: 2px solid var(--neon-pink);
+            font-family: 'Orbitron';
+            text-decoration: none;
+            transition: 0.4s;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 0, 229, 0.2);
+            margin-top: 2rem;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-neon:hover {
+            background: var(--neon-pink);
+            color: white;
+            box-shadow: 0 0 40px var(--neon-pink);
+            transform: scale(1.05);
+        }
+
+        /* Server Status Styles */
+        .status-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: var(--card-bg);
+            border: 1px solid var(--neon-blue);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+        }
+
+        .status-header {
+            background: rgba(0, 242, 255, 0.1);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: 'Orbitron';
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-online { background: rgba(0, 255, 136, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .status-offline { background: rgba(255, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .status-item {
+            background: var(--card-bg);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .status-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .status-value {
+            font-size: 1.8rem;
+            font-family: 'Orbitron';
+            color: white;
+        }
+
+        /* Faction & Partner Grid Styles */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .faction-link, .partner-card-wrapper {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border: 1px solid #333;
+            border-radius: 10px;
+            text-align: center;
+            transition: 0.3s;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card h3 {
+            margin-bottom: 0.5rem;
+            color: var(--neon-blue);
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            transform: translateY(-8px);
+            background: rgba(30, 30, 40, 0.95);
+        }
+
+        .faction-link .card::after {
+            content: 'Beitreten ➔';
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            width: 100%;
+            background: var(--neon-blue);
+            color: black;
+            font-weight: bold;
+            font-family: 'Orbitron';
+            font-size: 0.7rem;
+            padding: 5px 0;
+            transition: 0.3s;
+        }
+
+        .faction-link:hover .card::after {
+            bottom: 0;
+        }
+
+        /* Partner Button Styling */
+        .partner-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: auto;
+        }
+
+        .btn-partner {
+            padding: 0.6rem 1rem;
+            font-size: 0.75rem;
+            font-family: 'Orbitron';
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-partner-discord {
+            background: var(--neon-blue);
+            color: black;
+            font-weight: bold;
+        }
+
+        .btn-partner-discord:hover {
+            box-shadow: 0 0 15px var(--neon-blue);
+            transform: translateY(-2px);
+        }
+
+        .btn-partner-web {
+            border: 1px solid #555;
+            color: #ccc;
+        }
+
+        .btn-partner-web:hover {
+            border-color: white;
+            color: white;
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* NEW PARTNER LOGO STYLES */
+        .partner-logo-box {
+            width: 100px;
+            height: 100px;
+            border: 2px solid var(--neon-blue);
+            border-radius: 12px;
+            background: rgba(0,0,0,0.4);
+            margin: 0 auto 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .partner-logo-box img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            display: none; /* Hidden until loaded */
+        }
+
+        .partner-logo-box::after {
+            content: attr(data-emoji);
+            font-size: 2.5rem;
+            position: absolute;
+        }
+
+        .partner-logo-box.has-img img {
+            display: block;
+        }
+
+        .partner-logo-box.has-img::after {
+            display: none;
+        }
+
+        /* Team Section */
+        .team-section {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .team-tier-title {
+            text-align: center;
+            color: var(--neon-blue);
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid rgba(0, 242, 255, 0.3);
+            display: inline-block;
+            padding-bottom: 5px;
+            width: 100%;
+        }
+
+        .team-grid {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .member-card {
+            background: var(--card-bg);
+            border: 1px solid #333;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 15px;
+            position: relative;
+            transition: 0.4s;
+            width: 250px;
+        }
+
+        .member-card.gold::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #ffd700, #ffae00); }
+        .member-card.standard::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: #555; }
+
+        .member-image {
+            width: 100px;
+            height: 100px;
+            background: #111;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid var(--neon-blue);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .member-image img { width: 100%; height: 100%; object-fit: cover; }
+        .member-image::after { content: attr(data-emoji); font-size: 2.5rem; position: absolute; }
+        .member-image.has-img::after { display: none; }
+
+        footer {
+            padding: 3rem;
+            text-align: center;
+            border-top: 1px solid #222;
+            background: #000;
+            margin-top: 5rem;
+        }
+
+        .rule-link-card {
+            background: var(--card-bg);
+            border: 1px solid var(--neon-blue);
+            padding: 2.5rem;
+            margin: 0 auto 2rem;
+            max-width: 600px;
+            border-radius: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="neonRain"></canvas>
+
+    <div class="content-wrapper">
+        
+        <!-- SIDEBAR TRIGGER ZONE -->
+        <div class="sidebar-trigger"></div>
+        
+        <nav>
+            <div class="brand" onclick="showView('home')">Notruf Hamburg</div>
+            <div class="nav-links">
+                <a onclick="showView('home')">Home</a>
+                <a onclick="showView('status')">Server Status</a>
+                <a onclick="showView('rules')">Regelwerk</a>
+                <a onclick="showView('factions')">Fraktionen</a>
+                <a onclick="showView('team')">Team</a>
+                <a onclick="showView('partners')">Partnerschaften</a>
+                <a onclick="showView('social')">Social Media</a>
+                <a onclick="showView('support')">Support</a>
+                <a href="https://discord.gg/QNwppFex5g" target="_blank">Discord</a>
+            </div>
+        </nav>
+
+        <!-- HINWEIS PFEIL -->
+        <div class="nav-indicator">➔</div>
+
+        <!-- HOME VIEW -->
+        <main id="home" class="view active">
+            <section class="hero">
+                <h1>One State RP</h1>
+                <p style="font-size: 1.4rem; color: #aaa;">In OneState RP wird nicht gespielt – hier wird gelebt.</p>
+                <div class="logo-display-container">
+                    <div class="main-logo-box" id="mainLogoBox">
+                        <img src="images/bild.png" alt="Server Logo" onerror="this.style.display='none';">
+                    </div>
+                </div>
+                <a href="https://discord.gg/QNwppFex5g" target="_blank" class="btn-neon">Beitreten</a>
+            </section>
+        </main>
+
+        <!-- SERVER STATUS VIEW -->
+        <div id="status" class="view">
+            <div class="page-header" style="text-align: center; margin-bottom: 3rem;">
+                <h2>Live Server Status</h2>
+                <p style="color: #aaa;">Echtzeit-Daten von unserem Hamburg-Server</p>
+            </div>
+
+            <div class="status-container">
+                <div class="status-header">
+                    <div>
+                        <h3 style="color: white; font-size: 1.2rem;">⚠️Warnung: Funktion außer Betrieb⚠️ 
+Nutzung ist bis auf Weiteres nicht möglich.</h3>
+                        <p style="color: #666; font-size: 0.8rem; font-family: monospace;">ID: 60b059ea-f92c-431f-a63a-8d3ca60def62</p>
+                    </div>
+                    <div id="statusBadge" class="status-badge status-offline">Prüfen...</div>
+                </div>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-label">Spieler</span>
+                        <div class="status-value" id="playerCount">-- / --</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Version</span>
+                        <div class="status-value" id="serverVersion" style="font-size: 1.2rem;">--</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Update</span>
+                        <div class="status-value" id="lastUpdate" style="font-size: 1rem;">--</div>
+                    </div>
+                </div>
+                <div style="padding: 1.5rem; text-align: center;">
+                    <button class="btn-neon" style="margin: 0; padding: 0.6rem 1.5rem; font-size: 0.8rem;" onclick="updateServerStatus()">Aktualisieren</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RULES VIEW -->
+        <div id="rules" class="view">
+            <div class="page-header" style="text-align: center; margin-bottom: 3rem;">
+                <h2>Regelwerk</h2>
+            </div>
+            <div class="rule-link-card">
+                <h3>Discord Regelwerk</h3>
+                <a href="https://discord.com/channels/1420817538945781972/1420819403871883354/1452007224745525471" target="_blank" class="btn-neon">Öffnen</a>
+            </div>
+            <div class="rule-link-card">
+                <h3>In-Game Regelwerk</h3>
+                <a href="https://discord.com/channels/1420817538945781972/1420819404932776018/1451983872966398104" target="_blank" class="btn-neon">Öffnen</a>
+            </div>
+        </div>
+
+        <!-- FACTIONS VIEW -->
+        <div id="factions" class="view">
+            <div class="page-header" style="text-align: center; margin-bottom: 3rem;">
+                <h2>Fraktionen</h2>
+                <p style="color: #aaa;">Klicke auf eine Fraktion, um ihrem Discord-Bereich beizutreten.</p>
+            </div>
+            
+            <div class="grid-container">
+                <a href="#" target="_blank" class="faction-link">
+                    <div class="card"><h3>🚓 Polizei</h3><p>Schutz und Ordnung in Hamburg.</p></div>
+                </a>
+                <a href="#" target="_blank" class="faction-link">
+                    <div class="card"><h3>🚒 Feuerwehr</h3><p>Helden im Kampf gegen das Feuer.</p></div>
+                </a>
+                <a href="#" target="_blank" class="faction-link">
+                    <div class="card"><h3>🏥 Rettungsdienst</h3><p>Jede Sekunde zählt für ein Leben.</p></div>
+                </a>
+                <a href="#" target="_blank" class="faction-link">
+                    <div class="card"><h3>🪖 Bundeswehr</h3><p>Sicherung strategischer Punkte.</p></div>
+                </a>
+                <a href="#" target="_blank" class="faction-link">
+                    <div class="card"><h3>🛠️ ADAC</h3><p>Wir machen Hamburg wieder mobil.</p></div>
+                </a>
+                <a href="#" target="_blank" class="faction-link">
+                    <div class="card"><h3>🍷 107 Hundebande</h3><p>Loyalität steht über allem.</p></div>
+                </a>
+                <a href="#" target="_blank" class="faction-link">
+                    <div class="card"><h3>🥳 Nightfall Club</h3><p>Das Herz des Hamburger Nachtlebens.</p></div>
+                </a>
+                <a href="#" target="_blank" class="faction-link">
+                    <div class="card"><h3>⚖️ Kanzlei aller Kai</h3><p>Gerechtigkeit ist unser Handwerk.</p></div>
+                </a>
+                <a href="#" target="_blank" class="faction-link">
+                    <div class="card"><h3>📰 News</h3><p>Die Wahrheit ans Licht bringen.</p></div>
+                </a>
+                <a href="#" target="_blank" class="faction-link">
+                    <div class="card"><h3>🚕 Taxi</h3><p>Sicher durch die Großstadt.</p></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- TEAM VIEW -->
+        <div id="team" class="view">
+            <div class="team-section">
+                <div class="team-tier">
+                    <h3 class="team-tier-title">Projektleitung</h3>
+                    <div class="team-grid">
+                        <div class="member-card gold">
+                            <div class="member-image" data-emoji="👑"><img src="images/yannis.png" onerror="this.style.display='none'"></div>
+                            <h3>Yannis</h3>
+                        </div>
+                        <div class="member-card gold">
+                            <div class="member-image" data-emoji="👑"><img src="images/Lloyd.webp" onerror="this.style.display='none'"></div>
+                            <h3>Lloyd</h3>
+                        </div>
+                    </div>
+                </div>
+                        <div class="team-tier" style="margin-top: 3rem;">
+                    <h3 class="team-tier-title">Probe Projektleitung</h3>
+                    <div class="team-grid">
+                        <div class="member-card standard">
+                            <div class="member-image" data-emoji="👤"><img src="images/Kiwi.png" onerror="this.style.display='none'"></div>
+                            <h3>Kiwi</h3>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="team-tier" style="margin-top: 3rem;">
+                    <h3 class="team-tier-title">Leitungs Team</h3>
+                    <div class="team-grid">
+                        
+                        <div class="member-card standard">
+                            <div class="member-image" data-emoji="👤"><img src="images/Kai.png" onerror="this.style.display='none'"></div>
+                            <h3>Kai</h3>
+                        </div>
+                        <div class="member-card standard">
+                            <div class="member-image" data-emoji="👤"><img src="images/Jonas.png" onerror="this.style.display='none'"></div>
+                            <h3>Jonesy</h3>
+                        </div>
+                        <div class="member-card standard">
+                            <div class="member-image" data-emoji="👤"><img src="images/Lena.png" onerror="this.style.display='none'"></div>
+                            <h3>Lena</h3>
+                        </div>
+                        <div class="member-card standard">
+                            <div class="member-image" data-emoji="👤"><img src="images/WU.png" onerror="this.style.display='none'"></div>
+                            <h3>Sensei WU</h3>
+                        </div>
+                        <div class="member-card standard">
+                            <div class="member-image" data-emoji="👤"><img src="images/Alex.png" onerror="this.style.display='none'"></div>
+                            <h3>Alex</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PARTNERS VIEW -->
+        <div id="partners" class="view">
+            <div class="page-header" style="text-align: center; margin-bottom: 3rem;">
+                <h2>Unsere Partner</h2>
+                <p style="color: #aaa;">Starke Communitys, mit denen wir zusammenarbeiten.</p>
+            </div>
+            
+            <div class="grid-container">
+                <!-- Partner 1 -->
+                <div class="card">
+                    <div class="partner-logo-box" data-emoji="🤝">
+                        <img src="images/City Rp.png" alt="City RP Logo">
+                    </div>
+                    <h3>City RP</h3>
+                    <p>City RP ist ein deutscher Notruf Hamburg RP Server mit einer großartigen Community.</p>
+                    <div class="partner-actions">
+                        <a href="https://discord.gg/Vzde3CVkKT" target="_blank" class="btn-partner btn-partner-discord">Discord</a>
+                        <a href="https://city-rp.netlify.app/" target="_blank" class="btn-partner btn-partner-web">Webseite</a>
+                    </div>
+                </div>
+
+                <!-- Partner 2 -->
+                <div class="card">
+                    <div class="partner-logo-box" data-emoji="⭐">
+                        <img src="images/Asbach.png" alt="Asbach Logo">
+                    </div>
+                    <h3>Feuerwehr VG Asbach RP </h3>
+                    <p>Hier kannst du die Beschreibung für deinen zweiten Partner-Server eintragen.</p>
+                    <div class="partner-actions">
+                        <a href="https://discord.gg/v8DfN9RZBR" target="_blank" class="btn-partner btn-partner-discord">Discord</a>
+                    </div>
+                </div>
+
+                <!-- Partner 3 -->
+                <div class="card">
+                    <div class="partner-logo-box" data-emoji="🔥">
+                        <img src="images/GamingCityLogo.png" alt="Gaming City">
+                    </div>
+                    <h3>Gaming City</h3>
+                    <p>Hier kannst du verschiedene Spiele spielen.</p>
+                    <div class="partner-actions">
+                        <a href="https://discord.gg/AXckWUebHB" target="_blank" class="btn-partner btn-partner-discord">Discord</a>
+                        <a href="https://gaming-city-de.netlify.app/" target="_blank" class="btn-partner btn-partner-web">Webseite</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SOCIAL MEDIA VIEW -->
+        <div id="social" class="view">
+            <div class="page-header" style="text-align: center; margin-bottom: 3rem;">
+                <h2>Social Media</h2>
+                <p style="color: #aaa;">Folge uns auf unseren Kanälen und bleib up-to-date.</p>
+            </div>
+            <div class="grid-container">
+                <div class="card">
+                    <h3>WhatsApp</h3>
+                    <p>Tritt unserem WhatsApp Kanal bei.</p>
+                    <a href="#" target="_blank" class="btn-neon" style="margin-top: auto;">Beitreten</a>
+                </div>
+                <div class="card">
+                    <h3>TikTok</h3>
+                    <p>Die neusten Clips direkt aus Hamburg.</p>
+                    <a href="#" target="_blank" class="btn-neon" style="margin-top: auto;">Folgen</a>
+                </div>
+                <div class="card">
+                    <h3>YouTube</h3>
+                    <p>Verfolge unsere Livestreams und Videos.</p>
+                    <a href="#" target="_blank" class="btn-neon" style="margin-top: auto;">Abonnieren</a>
+                </div>
+                <div class="card">
+                    <h3>Instagram</h3>
+                    <p>Exklusive Einblicke und News.</p>
+                    <a href="#" target="_blank" class="btn-neon" style="margin-top: auto;">Folgen</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUPPORT VIEW -->
+        <div id="support" class="view">
+            <div class="page-header" style="text-align: center; margin-bottom: 3rem;">
+                <h2>Support</h2>
+                <p style="color: #aaa;">Probleme oder Fragen? Unser Team hilft dir gerne weiter.</p>
+            </div>
+            <div class="rule-link-card" style="border-color: var(--neon-pink);">
+                <h3>Ticket System</h3>
+                <p style="margin-bottom: 1.5rem;">Eröffne ein Support-Ticket auf unserem Discord-Server.</p>
+                <a href="https://discord.com/channels/1420817538945781972/1420819562533884047/1447269892217901219" target="_blank" class="btn-neon">Ticket erstellen</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>One State RP | Notruf Hamburg </p>
+            <p>| Projektleitung Lloyd und Yannis |</p>
+        </footer>
+    </div>
+
+    <script>
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            const target = document.getElementById(viewId);
+            if (target) {
+                target.classList.add('active');
+                if(viewId === 'status') updateServerStatus();
+            }
+            window.scrollTo(0,0);
+        }
+
+        // Server Status Logic
+        const API_URL = "https://corsproxy.io/?https://api.emergency-hamburg.com/public/servers";
+        const SERVER_ID = "60b059ea-f92c-431f-a63a-8d3ca60def62";
+
+        async function updateServerStatus() {
+            const badge = document.getElementById('statusBadge');
+            const players = document.getElementById('playerCount');
+            const version = document.getElementById('serverVersion');
+            const lastUpdate = document.getElementById('lastUpdate');
+
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('API Error');
+                
+                const data = await response.json();
+                const server = data.find(s => s.id === SERVER_ID);
+
+                if (server) {
+                    badge.innerText = "Online";
+                    badge.className = "status-badge status-online";
+                    players.innerText = `${server.players} / ${server.maxPlayers}`;
+                    version.innerText = server.version || "1.0.0";
+                    lastUpdate.innerText = new Date().toLocaleTimeString();
+                } else {
+                    throw new Error('Server not found');
+                }
+            } catch (err) {
+                badge.innerText = "Offline";
+                badge.className = "status-badge status-offline";
+                players.innerText = "0 / 0";
+                version.innerText = "ERR";
+                lastUpdate.innerText = "Keine Verbindung";
+            }
+        }
+
+        // Image Checkers
+        function checkImages() {
+            document.querySelectorAll('.member-image img, .main-logo-box img').forEach(img => {
+                img.onload = function() { 
+                    if (this.naturalWidth > 0) this.parentElement.classList.add('has-img'); 
+                };
+                if (img.complete && img.naturalWidth !== 0) img.parentElement.classList.add('has-img');
+            });
+
+            document.querySelectorAll('.partner-logo-box img').forEach(img => {
+                img.onload = function() {
+                    if (this.naturalWidth > 0) this.parentElement.classList.add('has-img');
+                };
+                img.onerror = function() {
+                    this.parentElement.classList.remove('has-img');
+                    this.style.display = 'none';
+                };
+                if (img.complete && img.naturalWidth !== 0) img.parentElement.classList.add('has-img');
+            });
+        }
+        checkImages();
+
+        // Canvas Particles
+        const canvas = document.getElementById('neonRain');
+        const ctx = canvas.getContext('2d');
+        let canvasW, canvasH, particles = [];
+
+        function initCanvas() {
+            canvasW = window.innerWidth;
+            canvasH = window.innerHeight;
+            canvas.width = canvasW;
+            canvas.height = canvasH;
+            particles = [];
+            for (let i = 0; i < 120; i++) particles.push(new Particle());
+        }
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvasW;
+                this.y = Math.random() * canvasH;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = Math.random() * 2 + 0.5;
+                this.color = Math.random() > 0.5 ? '#00f2ff' : '#ff00e5';
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                if (this.y > canvasH) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvasW, canvasH);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        animate();
+    </script>
+</body>
+</html>
